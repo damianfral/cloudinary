@@ -1,0 +1,45 @@
+name:                cloudinary-types
+version:             0.1.0
+description:         Cloudinary API types
+license:             MIT
+license-file:        LICENSE
+author:              damianfral
+maintainer:          huevofritopamojarpan@gmail.com
+
+
+library :
+ 
+  source-dirs     : src
+
+  exposed-modules : 
+
+    - Data.Cloudinary
+
+  dependencies :
+
+    - aeson
+    - base
+    - envy
+    - generic-lens
+    - http-api-data
+    - lens
+    - mtl
+    - protolude
+    - text
+
+  default-extensions :
+
+    - ConstraintKinds
+    - DataKinds
+    - DeriveAnyClass
+    - DeriveGeneric
+    - FlexibleContexts
+    - FlexibleInstances
+    - MultiParamTypeClasses
+    - NoImplicitPrelude
+    - OverloadedLabels
+    - OverloadedStrings
+    - RankNTypes
+    - TypeApplications
+    - TypeOperators
+
