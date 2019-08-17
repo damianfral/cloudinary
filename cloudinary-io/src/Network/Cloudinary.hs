@@ -83,14 +83,14 @@ cloudinaryConfigToBasicAuth cc = BasicAuthData u p
     u = strConv Strict $ cc ^. #cloudinaryApiKey
     p = strConv Strict $ cc ^. #cloudinaryApiSecret
 
-getStatusCode :: GenResponse a -> Int
+getStatusCode :: Response -> Int
 getStatusCode ( Response status  _ _ _ ) = fromEnum status
 
 toCloudinaryError
   :: ( AsCloudinaryError e
      , MonadError e m )
-  => ServantError -> m a
-toCloudinaryError f@( FailureResponse r ) = injectError $
+  => ClientError -> m a
+toCloudinaryError f@( FailureResponse _ r ) = injectError $
   case getStatusCode r of
     400 -> BadRequest
     401 -> AuthRequired
