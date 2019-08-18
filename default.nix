@@ -1,18 +1,15 @@
-{ sources ? import ./nix/sources.nix }:     # import the sources
+{ sources ? import ./nix/sources.nix }:
 with
-  { overlay = _: pkgs:
-      { niv = import sources.niv {};    # use the sources :)
+  { overlay = _: pkgs: rec
+      { inherit (import sources.niv {}) niv;
+        haskellPackages = pkgs.haskellPackages.override
+          { overrides = _: super:
+              { cloudinary-types = super.callCabal2nix "cloudinary-types" ./cloudinary-types {}; 
+                cloudinary-io = super.callCabal2nix "cloudinary-io" ./cloudinary-io {}; 
+              };
+          };
       };
   };
-
-import sources.nixpkgs                  # and use them again!
-  { overlays = 
-    [ (pkgs : _ : {
-        cloudinary-types = pkgs.haskellPackages.callCabal2nix "cloudinary-types" ./cloudinary-types {} ;
-        cloudinary-io = pkgs.haskellPackages.callCabal2nix "cloudinary-io" ./cloudinary-io {} ;
-      })
-       
-    ] 
-  ; config = {}; 
-}
+import sources.nixpkgs
+  { overlays = [ overlay ] ; config = {}; }
 
