@@ -1,9 +1,13 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables  #-}
+{-# LANGUAGE StandaloneDeriving   #-}
 
 module Network.Cloudinary where
 
 import           Protolude
+
+import           Control.Monad.Base
+import           Control.Monad.Trans.Control
 
 import           Data.Cloudinary
 import           Data.Generics.Labels     ()
@@ -47,8 +51,9 @@ cloudinaryAPI = Proxy
 
 -------------------------------------------------------------------------------
 
-data CloudinaryIOEnv = CloudinaryIOEnv { clientEnv :: ClientEnv, config :: CloudinaryConfig }
-  deriving stock ( Generic)
+data CloudinaryIOEnv = CloudinaryIOEnv 
+  { clientEnv :: ClientEnv, config :: CloudinaryConfig 
+  } deriving stock ( Generic)
 
 getBaseUrl :: CloudinaryConfig -> BaseUrl
 getBaseUrl cc = BaseUrl Https "api.cloudinary.com" 443
@@ -59,7 +64,7 @@ injectError = throwError . injectTyped
 
 initialize :: CloudinaryConfig -> IO CloudinaryIOEnv
 initialize cc = do
-  mgr  <- newTlsManager -- tlsManagerSettings
+  mgr  <- newTlsManager
   pure $ CloudinaryIOEnv ( ClientEnv mgr bUrl Nothing ) cc
   where bUrl = getBaseUrl cc
 
@@ -117,7 +122,7 @@ wrap authClientM = do
   res       <- liftIO $ runClientM ( authClientM bAuth ) ( cEnv ^. #clientEnv )
   case res of
     Left  e -> toCloudinaryError e
-    Right r -> print r >> return r
+    Right r -> return r
 
 
 instance 
@@ -151,5 +156,15 @@ class ( MonadError e m , AsCloudinaryError e ) => Cloudinary e m where
 
 
 newtype CloudinaryIO m a = CloudinaryIO ( m a )
-  deriving newtype ( Functor, Applicative, Monad, MonadReader r, MonadIO, MonadError e)
+  deriving newtype 
+    ( Functor
+    , Applicative
+    , Monad
+    , MonadReader r
+    , MonadIO
+    , MonadError e
+    )
+
+deriving instance ( Applicative m, Monad m, MonadIO m) => MonadBase IO (CloudinaryIO m)
+deriving instance ( Applicative m, Monad m, MonadIO m) => MonadBaseControl IO (CloudinaryIO m)
 

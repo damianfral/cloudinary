@@ -19,16 +19,18 @@ library :
 
     - aeson
     - base
+    - cloudinary-types
     - envy
     - generic-lens
     - http-client-tls
     - lens
+    - monad-control
     - mtl
     - protolude
     - servant
     - servant-client
     - text
-    - cloudinary-types
+    - transformers-base
 
   default-extensions :
     

@@ -21,11 +21,11 @@ library :
     - base
     - envy
     - generic-lens
-    - http-api-data
     - lens
     - mtl
     - protolude
     - text
+    - http-api-data
 
   default-extensions :
 
