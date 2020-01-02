@@ -19,13 +19,13 @@ import           Web.HttpApiData
 
 data Resource = Resource
   { public_id     :: Text
-  , format        :: Text
+  , format        :: Maybe Text
   , version       :: Int
   , resource_type :: ResourceType
   , created_at    :: Text -- TODO: Use date
   , bytes         :: Int
-  , width         :: Int
-  , height        :: Int
+  , width         :: Maybe Int
+  , height        :: Maybe Int
   , url           :: Text
   , secure_url    :: Text
   , tags          :: [ Text ]
