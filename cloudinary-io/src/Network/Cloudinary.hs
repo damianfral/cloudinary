@@ -1,6 +1,6 @@
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables  #-}
 {-# LANGUAGE StandaloneDeriving   #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Network.Cloudinary where
 
@@ -10,17 +10,17 @@ import           Control.Monad.Base
 import           Control.Monad.Trans.Control
 
 import           Data.Cloudinary
-import           Data.Generics.Labels     ()
-import           Data.Generics.Sum
+import           Data.Generics.Labels        ()
 import           Data.Generics.Product
+import           Data.Generics.Sum
 import           Data.Text
 
-import           Control.Lens             hiding (Strict)
+import           Control.Lens                hiding (Strict)
 
 import           Servant.API
 import           Servant.Client
 
-import           Network.HTTP.Client.TLS  (newTlsManager)
+import           Network.HTTP.Client.TLS     (newTlsManager)
 
 -------------------------------------------------------------------------------
 
@@ -28,14 +28,15 @@ type WithAuth a = BasicAuth "cloudinary-realm" (Text, Text) :> a
 
 type BrowseAPI
   =    "resources"
-       :> Capture "resourceType" ResourceType
+       :> Capture "resource_type" ResourceType
        :> QueryParam "tags" Bool
        :> WithAuth ( Get '[JSON] ResourceBatch )
   :<|> "resources"
-       :> Capture "resourceType" ResourceType
+       :> Capture "resource_type" ResourceType
        :> "upload"
        :> QueryParam "prefix" Text
        :> QueryParam "tags" Bool
+       :> QueryParam "max_results" Int
        :> WithAuth ( Get '[JSON] ResourceBatch )
 
 type FoldersAPI
@@ -51,8 +52,8 @@ cloudinaryAPI = Proxy
 
 -------------------------------------------------------------------------------
 
-data CloudinaryIOEnv = CloudinaryIOEnv 
-  { clientEnv :: ClientEnv, config :: CloudinaryConfig 
+data CloudinaryIOEnv = CloudinaryIOEnv
+  { clientEnv :: ClientEnv, config :: CloudinaryConfig
   } deriving stock ( Generic)
 
 getBaseUrl :: CloudinaryConfig -> BaseUrl
@@ -72,7 +73,7 @@ initialize cc = do
 -- finalize ( ClientEnv mgr _ _ ) = liftIO $ closeManager manager--
 
 getResources'         :: ResourceType -> Maybe Bool -> BasicAuthData -> ClientM ResourceBatch
-getResourcesByFolder' :: ResourceType -> Maybe Text -> Maybe Bool -> BasicAuthData
+getResourcesByFolder' :: ResourceType -> Maybe Text -> Maybe Bool -> Maybe Int -> BasicAuthData
                       -> ClientM ResourceBatch
 getRootFolders'       :: BasicAuthData -> ClientM Folders
 getFolders'           :: [ Text ] -> BasicAuthData -> ClientM Folders
@@ -125,7 +126,7 @@ wrap authClientM = do
     Right r -> return r
 
 
-instance 
+instance
   ( MonadIO m
   , MonadReader r m
   , HasType CloudinaryIOEnv r
@@ -140,11 +141,11 @@ instance
     = wrap $ getFolders' $ splitOn "/" folder
 
   getResources resourceType
-    = wrap $ fmap resources . ( getResources' resourceType $ Just True )
+    = wrap $ fmap resources . ( getResources' resourceType ( Just True ) )
 
   getResourcesByFolder resourceType folder
     = wrap $ fmap resources
-           . getResourcesByFolder' resourceType ( Just folder ) ( Just True )
+           . getResourcesByFolder' resourceType ( Just folder ) ( Just True ) (Just 500)  
 
 -------------------------------------------------------------------------------
 
@@ -156,7 +157,7 @@ class ( MonadError e m , AsCloudinaryError e ) => Cloudinary e m where
 
 
 newtype CloudinaryIO m a = CloudinaryIO ( m a )
-  deriving newtype 
+  deriving newtype
     ( Functor
     , Applicative
     , Monad
