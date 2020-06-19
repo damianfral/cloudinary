@@ -1,3 +1,11 @@
+
+
+(
+  import (fetchTarball https://github.com/edolstra/flake-compat/archive/master.tar.gz) {
+    src = builtins.fetchGit ./.;
+  }
+).shellNix
+
 # let
 #   project = (import ./.).haskellPackages.server;
 # in
@@ -26,14 +34,16 @@
 #   ];
 # }A
 
-{ pkgs ? import <nixpkgs> { } }:
-with pkgs;
-mkShell {
-  buildInputs = [
-    nixpkgs-fmt
-  ];
+# { pkgs ? import <nixpkgs> { } }:
+# with pkgs;
+# mkShell {
+#   buildInputs =
+#     ( import ./default.nix).haskellPackages.cloudinary-io.env.nativeBuildInputs;
+#     # nixpkgs-fmt
+#     # cabal-install
+#   # ];
 
-  shellHook = ''
-    # ...
-  '';
-}
+#   shellHook = ''
+#     # ...
+#   '';
+# }
