@@ -19,8 +19,9 @@
         overlay = import ./overlay;
         packages.${system} =
           with pkgs.haskellPackages;
-          { inherit cloudinary-types cloudinary-io; };
+          { inherit cloudinary; };
 
-        defaultPackage.${system} = self.packages.${system}.cloudinary-types;
+        devShell.${system}       = self.packages.${system}.cloudinary.env;
+        defaultPackage.${system} = self.packages.${system}.cloudinary;
       };
 }

@@ -24,10 +24,10 @@ newtype AppEnv = AppEnv { cloudinaryEnv :: CloudinaryIOEnv } deriving ( Generic 
 newtype AppError = CloudinaryAppError CloudinaryError deriving ( Generic, Show )
 
 type App = AppM AppEnv AppError
-deriving via CloudinaryIO App instance Cloudinary AppError App 
+deriving via CloudinaryIO App instance Cloudinary AppError App
 
 runApp :: App a -> CloudinaryConfig -> IO ( Either AppError a )
-runApp app r = bracket ( initialize r ) ( const $ pure () ) 
+runApp app r = bracket ( initialize r ) ( const $ pure () )
   $ \clientEnv -> do
     runReaderT ( runResourceT $ runExceptT $ runAppM app ) $ AppEnv clientEnv
 
