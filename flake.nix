@@ -17,11 +17,20 @@
     in
       {
         overlay = import ./overlay;
+
         packages.${system} =
           with pkgs.haskellPackages;
           { inherit cloudinary; };
 
         devShell.${system}       = self.packages.${system}.cloudinary.env;
         defaultPackage.${system} = self.packages.${system}.cloudinary;
+        apps.${system} =
+          { cloudinary-cli = {
+              type = "app";
+              program = "${pkgs.haskellPackages.cloudinary}/bin/cloudinary-cli";
+            };
+          };
+
+        defaultApp.${system} = self.apps.${system}.cloudinary-cli;
       };
 }
