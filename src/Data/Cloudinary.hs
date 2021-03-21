@@ -8,7 +8,8 @@ import           Data.Aeson
 import           Data.Aeson.Types      (typeMismatch)
 import           Data.Generics.Product
 import           Data.Generics.Sum
-import           Data.Text             (toLower)
+import qualified Data.Text  as T
+import           Data.Text  (Text)
 
 import           System.Envy
 import           Web.HttpApiData
@@ -38,11 +39,11 @@ data ResourceType = Image
                   deriving ( Show, Eq, Generic )
 
 instance ToHttpApiData ResourceType where
-  toUrlPiece = toLower . show
+  toUrlPiece = T.toLower . show
 
 
 instance ToJSON ResourceType where
-  toJSON = String . toLower . show
+  toJSON = String . T.toLower . show
 
 instance FromJSON ResourceType where
   parseJSON ( String "image" ) = pure Image
