@@ -66,7 +66,8 @@ injectError = throwError . injectTyped
 initialize :: CloudinaryConfig -> IO CloudinaryIOEnv
 initialize cc = do
   mgr  <- newTlsManager
-  pure $ CloudinaryIOEnv ( ClientEnv mgr bUrl Nothing ) cc
+  let clientEnv = mkClientEnv mgr bUrl
+  pure $ CloudinaryIOEnv clientEnv cc
   where bUrl = getBaseUrl cc
 
 -- finalize :: MonadIO m => ClientEnv -> m ()--
@@ -86,8 +87,8 @@ getFolders'           :: [ Text ] -> BasicAuthData -> ClientM Folders
 cloudinaryConfigToBasicAuth :: CloudinaryConfig -> BasicAuthData
 cloudinaryConfigToBasicAuth cc = BasicAuthData u p
   where
-    u = strConv Strict $ cc ^. #cloudinaryApiKey
-    p = strConv Strict $ cc ^. #cloudinaryApiSecret
+    u = encodeUtf8 $ cc ^. #cloudinaryApiKey
+    p = encodeUtf8 $ cc ^. #cloudinaryApiSecret
 
 getStatusCode :: Response -> Int
 getStatusCode ( Response status  _ _ _ ) = fromEnum status
@@ -145,7 +146,7 @@ instance
 
   getResourcesByFolder resourceType folder
     = wrap $ fmap resources
-           . getResourcesByFolder' resourceType ( Just folder ) ( Just True ) (Just 500)  
+           . getResourcesByFolder' resourceType ( Just folder ) ( Just True ) (Just 500)
 
 -------------------------------------------------------------------------------
 
