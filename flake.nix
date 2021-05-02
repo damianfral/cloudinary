@@ -38,5 +38,8 @@
         };
 
       defaultApp.${system} = self.apps.${system}.cloudinary-cli;
+      checks.${system} = {
+        build = self.defaultPackage.${system};
+      };
     };
 }
