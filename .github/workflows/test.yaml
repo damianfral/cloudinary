@@ -1,8 +1,8 @@
 ---
 name: "build"
 on:
-  pull_request: true
-  push: true
+  pull_request:
+  push:
 jobs:
   build:
     runs-on: ubuntu-latest
