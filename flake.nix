@@ -38,10 +38,24 @@
         packages.cloudinary = with pkgs.haskellPackages; cloudinary;
         packages.default = packages.cloudinary;
 
-        devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs;
-            [cabal-install ghcid ormolu nixpkgs-fmt]
-            ++ self.packages.${system}.cloudinary.env.nativeBuildInputs;
+        devShells.default = pkgs.haskellPackages.shellFor {
+          packages = p: [p.cloudinary];
+          nativeBuildInputs = with pkgs;
+          with pkgs.haskellPackages; [
+            # actionlint
+            alejandra
+            cabal-install
+            feedback
+            ghcid
+            haskell-language-server
+            hlint
+            markdown-oxide
+            nil
+            ormolu
+            statix
+            yaml-language-server
+          ];
+          shellHook = precommitCheck.shellHook;
         };
         apps.cloudinary-cli = {
           type = "app";
