@@ -1,18 +1,21 @@
 {
   description = "Cloudinary client API";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/24.11";
-  inputs.flake-utils.url = "github:numtide/flake-utils";
-
-  inputs.pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
-  inputs.pre-commit-hooks.inputs.nixpkgs.follows = "nixpkgs";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/24.11";
+    flake-utils.url = "github:numtide/flake-utils";
+    pre-commit-hooks = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
 
   outputs = {
     self,
     nixpkgs,
     flake-utils,
     pre-commit-hooks,
-  } @ inputs:
+  }:
     {overlay = import ./overlay;}
     // flake-utils.lib.eachDefaultSystem (
       system: let
@@ -55,7 +58,7 @@
             statix
             yaml-language-server
           ];
-          shellHook = precommitCheck.shellHook;
+          inherit (precommitCheck) shellHook;
         };
         apps.cloudinary-cli = {
           type = "app";
