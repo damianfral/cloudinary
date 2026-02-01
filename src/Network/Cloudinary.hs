@@ -19,7 +19,7 @@ import Data.Cloudinary
 import Data.Generics.Labels ()
 import Data.Generics.Product
 import Data.Generics.Sum
-import Data.Text
+import Data.Text (splitOn, unpack)
 import Network.HTTP.Client.TLS (newTlsManager)
 import Protolude
 import Servant.API
