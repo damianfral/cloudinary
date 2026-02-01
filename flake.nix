@@ -2,8 +2,9 @@
   description = "Cloudinary client API";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    feedback.url = "github:NorfairKing/feedback";
     pre-commit-hooks = {
       url = "github:cachix/pre-commit-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -15,6 +16,7 @@
     nixpkgs,
     flake-utils,
     pre-commit-hooks,
+    feedback,
   }:
     {overlay = import ./overlay;}
     // flake-utils.lib.eachDefaultSystem (
@@ -48,7 +50,7 @@
             # actionlint
             alejandra
             cabal-install
-            feedback
+            feedback.packages.${system}.default
             ghcid
             haskell-language-server
             hlint
