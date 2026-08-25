@@ -1,4 +1,5 @@
 name: cloudinary
+synopsis: Haskell client API for Cloudinary
 version: 0.2.0
 description: Cloudinary API
 license: MIT
